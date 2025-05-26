@@ -12,7 +12,7 @@ def index(request):
     return JsonResponse({"message": "Bienvenue sur mon API !"})
 
 class CommentaireListApiView(APIView):
-
+    # On permet l'authentification ET l'accès annonyme
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             commentaires = Commentaire.objects.filter(user=request.user)
@@ -22,11 +22,18 @@ class CommentaireListApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
+        # Au lieu de data = request.data, on spécifie seulement les entêtes requises, la date est exclu
         data = {
             'titre': request.data.get('titre'),
             'commentaire': request.data.get('commentaire'),
         }
-        serializer = CommentaireSerializer(data=data)
+        # Vérifier s'il y a une liste d'objets dans l'instance POST OU un seul
+        if isinstance(data, list):
+            serializer = CommentaireSerializer(data=data, many=True)
+        else:
+            serializer = CommentaireSerializer(data=data)
+        
+        # On permet également l'authentification ET l'accès annonyme
         if serializer.is_valid():
             if request.user.is_authenticated:
                 serializer.save(user=request.user)
