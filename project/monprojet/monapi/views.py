@@ -13,17 +13,22 @@ def index(request):
 
 class CommentaireListApiView(APIView):
     # On permet l'authentification ET l'accès annonyme
-    def get(self, request, *args, **kwargs):
+    def get(self, request, id, *args, **kwargs):
         if request.user.is_authenticated:
             commentaires = Commentaire.objects.filter(user=request.user)
+            
         else:
-            commentaires = Commentaire.objects.none()
+            commentaires = Commentaire.objects.filter(pk=id)
+            if not Commentaire:
+                return Response({"res": "Object with id does not exists"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         serializer = CommentaireSerializer(commentaires, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
         data = request.data
-        
+
         # Vérifier s'il y a une liste d'objets dans l'instance POST OU un seul
         if isinstance(data, list):
             serializer = CommentaireSerializer(data=data, many=True)
@@ -40,4 +45,15 @@ class CommentaireListApiView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, id, *args, **kwargs):
+        commentaire = Commentaire.object.get(pk=id)
+        if not commentaire:
+            return Response(
+                {"res":"Object with id does not exists"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        commentaire.delete()
+        return Response({"res":"Object deleted!"},
+                        status=status.HTTP_200_OK
+                        )
 # Create your views here.
