@@ -6,15 +6,18 @@ from rest_framework import status
 from .models import Commentaire
 from .serializer import CommentaireSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 
 def index(request):
     return JsonResponse({"message": "Bienvenue sur mon API !"})
 
 class CommentaireListApiView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        commentaires = Commentaire.objects.filter(user = request.user.id)
+        if request.user.is_authenticated:
+            commentaires = Commentaire.objects.filter(user=request.user)
+        else:
+            commentaires = Commentaire.objects.none()
         serializer = CommentaireSerializer(commentaires, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -29,7 +32,6 @@ class CommentaireListApiView(APIView):
                 serializer.save(user=request.user)
             else:
                 serializer.save(user=None)
-            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
