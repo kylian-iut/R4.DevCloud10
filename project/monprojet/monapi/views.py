@@ -5,11 +5,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Commentaire
 from .serializer import CommentaireSerializer
+from rest_framework.permissions import IsAuthenticated
 
 def index(request):
     return JsonResponse({"message": "Bienvenue sur mon API !"})
 
 class CommentaireListApiView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
         commentaires = Commentaire.objects.filter(user = request.user.id)
         serializer = CommentaireSerializer(commentaires, many=True)
@@ -22,6 +25,10 @@ class CommentaireListApiView(APIView):
         }
         serializer = CommentaireSerializer(data=data)
         if serializer.is_valid():
+            if request.user.is_authenticated:
+                serializer.save(user=request.user)
+            else:
+                serializer.save(user=None)
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
