@@ -22,11 +22,8 @@ class CommentaireListApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
-        # Au lieu de data = request.data, on spécifie seulement les entêtes requises, la date est exclu
-        data = {
-            'titre': request.data.get('titre'),
-            'commentaire': request.data.get('commentaire'),
-        }
+        data = request.data
+        
         # Vérifier s'il y a une liste d'objets dans l'instance POST OU un seul
         if isinstance(data, list):
             serializer = CommentaireSerializer(data=data, many=True)
