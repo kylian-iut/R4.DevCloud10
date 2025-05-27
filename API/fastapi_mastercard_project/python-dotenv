@@ -1,0 +1,10 @@
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # charge le fichier .env
+
+api_key = os.getenv('MASTERCARD_API_KEY')
+private_key_path = os.getenv('MASTERCARD_PRIVATE_KEY_PATH')
+
+print(f"API Key: {api_key}")
+print(f"Private Key Path: {private_key_path}")
