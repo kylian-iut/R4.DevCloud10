@@ -6,6 +6,10 @@ app = FastAPI()
 class CardIdRequest(BaseModel):
     card_id: str
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello c'est Kyks"}
+
 @app.post("/clear-pin-try-counter")
 async def clear_pin_try_counter(request: CardIdRequest):
     # Ici tu récupères request.card_id
