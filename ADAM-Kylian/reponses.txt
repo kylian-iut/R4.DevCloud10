@@ -1,0 +1,5 @@
+exercice 1 :
+q1: curl -d '{"titre": "La balade de champs heureux","artiste": "Michel Sardou","date_de_production": "1987-05-14","nombre_de_pistes": 4,"duree_en_minutes": 33}' -H 'Content-Type:application/json' http://127.0.0.1:8000/monapi/api/
+q2: curl http://127.0.0.1:8000/monapi/api/albums/2
+
+
